@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องเรียน 3/1 - รายละเอียดและคะแนนนักเรียน</title>
+    <style>
+        /* CSS สำหรับจัดรูปแบบทั่วไปของหน้าเว็บ */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* สีพื้นหลังอ่อนๆ */
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* สไตล์สำหรับส่วนหัวของเว็บไซต์ */
+        header {
+            background-color: #2c3e50; /* สีกรมท่าเข้ม */
+            color: #ecf0f1; /* สีเทาอ่อน */
+            padding: 20px 0;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        /* สไตล์สำหรับแถบนำทาง (Navigation Bar) */
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* ให้เมนูขึ้นบรรทัดใหม่เมื่อหน้าจอเล็ก */
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 5px 0;
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #3498db; /* สีฟ้าอ่อนเมื่อโฮเวอร์ */
+            border-bottom: 2px solid #3498db;
+        }
+
+        /* สไตล์สำหรับคอนเทนเนอร์ของปุ่มสลับตาราง */
+        .toggle-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px; /* ระยะห่างระหว่างปุ่ม */
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .toggle-btn {
+            background-color: #607d8b; /* สีเทาอมฟ้า */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .toggle-btn:hover {
+            background-color: #455a64; /* สีเข้มขึ้นเมื่อโฮเวอร์ */
+        }
+
+        .toggle-btn.active {
+            background-color: #007bff; /* สีน้ำเงินสำหรับปุ่มที่เลือกอยู่ */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px); /* ยกขึ้นเล็กน้อย */
+        }
+
+
+        /* สไตล์สำหรับคอนเทนเนอร์ของตาราง */
+        .table-container {
+            width: 90%;
+            max-width: 1000px;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* ทำให้ตารางมีแถบเลื่อนแนวนอนถ้าข้อมูลเยอะเกินไป */
+            margin-bottom: 20px; /* เพิ่มระยะห่างด้านล่าง */
+        }
+
+        /* สไตล์สำหรับตาราง */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* รวมเส้นขอบของเซลล์เข้าด้วยกัน */
+            margin: 0 auto; /* จัดกึ่งกลางตาราง */
+        }
+
+        /* สไตล์สำหรับส่วนหัวของตาราง (<thead>) */
+        th {
+            background-color: #34495e; /* สีกรมท่า */
+            color: #ecf0f1;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #2c3e50;
+            font-weight: bold;
+        }
+
+        /* สไตล์สำหรับข้อมูลในตาราง (<td>) และแถว (<tr>) */
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd; /* เส้นแบ่งแถว */
+            text-align: left;
+        }
+
+        /* สไตล์เมื่อนำเมาส์ไปชี้ที่แถว */
+        tr:hover {
+            background-color: #f0f8ff; /* สีฟ้าอ่อนเมื่อโฮเวอร์ */
+        }
+
+        /* สไตล์สำหรับแถวคู่-คี่ (เพื่อให้แยกแยะง่ายขึ้น) */
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* สีเทาอ่อนสำหรับแถวคู่ */
+        }
+
+        /* สไตล์สำหรับปุ่มดูรายละเอียด */
+        .details-btn {
+            background-color: #4CAF50; /* สีเขียว */
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .details-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* สไตล์สำหรับ Modal (Pop-up) */
+        .modal-overlay {
+            display: none; /* ซ่อนไว้ตอนแรก */
+            position: fixed; /* อยู่เหนือเนื้อหาทั้งหมด */
+            z-index: 1000; /* ให้แสดงทับองค์ประกอบอื่น */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* พื้นหลังทึบแสง */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px; /* เพิ่มความกว้าง modal เพื่อรองรับช่องคะแนน */
+            position: relative;
+            animation: fadeIn 0.3s ease-out; /* แอนิเมชันตอนเปิด */
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+        }
+
+        .modal-content p strong {
+            color: #34495e;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* แอนิเมชัน Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* สไตล์สำหรับส่วนแก้ไขคะแนนใน Modal */
+        .score-editing-section {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc; /* เส้นแบ่ง */
+        }
+
+        .score-editing-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex; /* ใช้ flexbox เพื่อจัดวางวันที่/เวลา */
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* ระยะห่างระหว่างข้อความกับวันที่ */
+        }
+        .score-editing-section h4 span {
+            font-weight: normal; /* ทำให้วันที่/เวลาไม่เป็นตัวหนาเท่าหัวข้อ */
+        }
+
+        .score-input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* ปรับคอลัมน์ให้ยืดหยุ่น */
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-input-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* ชิดซ้าย */
+        }
+
+        .score-input-item label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .score-input-item input[type="number"],
+        .score-input-item input[type="password"] { /* เพิ่มสไตล์สำหรับ input password */
+            width: calc(100% - 16px); /* หัก padding */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            text-align: center; /* จัดตัวเลขอยู่ตรงกลาง */
+        }
+
+        .score-modal-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .score-modal-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .score-modal-actions .save-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .score-modal-actions .save-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .score-modal-actions .cancel-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .score-modal-actions .cancel-btn:hover {
+            background-color: #5a6268;
+        }
+
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            nav ul li {
+                margin: 0 10px;
+            }
+            nav ul li a {
+                font-size: 1em;
+            }
+            .table-container {
+                width: 95%; /* ใช้ความกว้างมากขึ้นบนหน้าจอเล็ก */
+                padding: 15px;
+            }
+            th, td {
+                padding: 8px 10px; /* ลด padding ลง */
+                font-size: 0.9em; /* ลดขนาดตัวอักษร */
+            }
+            .details-btn, .toggle-btn {
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            .close-button {
+                font-size: 1.8em;
+                top: 10px;
+                right: 15px;
+            }
+            .score-input-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* ปรับคอลัมน์ใน modal เล็กน้อย */
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            nav ul li {
+                margin: 0 5px;
+            }
+            nav ul li a {
+                font-size: 0.9em;
+            }
+            .table-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>คำชะอีวิทยาคาร</h1>
+        <p>โรงเรียนแห่งความรู้ คู่คุณธรรม</p>
+        <nav>
+            <ul>
+                <li><a href="index.html">หน้าหลัก</a></li>
+                <li><a href="Class.html">ข้อมูลระดับชั้น</a></li>
+                <li><a href="#about">เกี่ยวกับโรงเรียน</a></li>
+                <li><a href="#contact">ติดต่อเรา</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="toggle-buttons">
+        <button id="showStudentListBtn" class="toggle-btn active">รายชื่อของนักเรียน</button>
+        <button id="showStudentScoresBtn" class="toggle-btn">ค่าห้องของนักเรียน</button>
+    </div>
+
+    <div id="studentListTableContainer" class="table-container">
+        <h2>รายชื่อนักเรียน ห้อง 3/1</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>เลขที่</th>
+                    <th>รหัสนักเรียน</th>
+                    <th>ชื่อ - นามสกุล</th>
+                    <th>สถานะ</th>
+                    <th>รายละเอียด</th>
+                </tr>
+            </thead>
+            <tbody id="studentListTableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="scoreTableContainer" class="table-container" style="display:none;">
+        <h2>ค่าห้องของนักเรียน ห้อง 3/1</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>เลขที่</th>
+                    <th>รหัสนักเรียน</th>
+                    <th>ชื่อ - นามสกุล</th>
+                    <th>พฤษภาคม</th>
+                    <th>มิถุนายน</th>
+                    <th>กรกฎาคม</th>
+                    <th>สิงหาคม</th>
+                    <th>กันยายน</th>
+                    <th>ตุลาคม</th>
+                    <th>พฤศจิกายน</th>
+                    <th>ธันวาคม</th>
+                    <th>มกราคม</th>
+                    <th>กุมภาพันธ์</th>
+                    <th>มีนาคม</th>
+                    <th>รวม</th>
+                </tr>
+            </thead>
+            <tbody id="scoreTableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="studentDetailModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modalStudentName"></h3>
+            <p><strong>รหัสนักเรียน:</strong> <span id="modalStudentId"></span></p>
+            <p><strong>ชั้นปี:</strong> <span id="modalStudentGrade"></span></p>
+            <p><strong>ห้องเรียน:</strong> <span id="modalStudentClass"></span></p>
+            <p><strong>สถานะ:</strong> <span id="modalStudentStatus"></span></p>
+            <p><strong>วันเกิด:</strong> <span id="modalStudentDob"></span></p>
+            <p><strong>เบอร์โทรศัพท์:</strong> <span id="modalStudentPhone"></span></p>
+
+            <div class="score-editing-section">
+                <h4>แก้ไขค่าห้องรายเดือนของนักเรียน <span id="currentDateTime" style="font-size: 0.8em; color: #777;"></span></h4>
+                <div class="score-input-grid">
+                    <div class="score-input-item">
+                        <label for="scoreMay">พฤษภาคม</label>
+                        <input type="number" id="scoreMay" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreJun">มิถุนายน</label>
+                        <input type="number" id="scoreJun" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreJul">กรกฎาคม</label>
+                        <input type="number" id="scoreJul" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreAug">สิงหาคม</label>
+                        <input type="number" id="scoreAug" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreSep">กันยายน</label>
+                        <input type="number" id="scoreSep" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreOct">ตุลาคม</label>
+                        <input type="number" id="scoreOct" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreNov">พฤศจิกายน</label>
+                        <input type="number" id="scoreNov" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreDec">ธันวาคม</label>
+                        <input type="number" id="scoreDec" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreJan">มกราคม</label>
+                        <input type="number" id="scoreJan" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreFeb">กุมภาพันธ์</label>
+                        <input type="number" id="scoreFeb" min="0" max="100">
+                    </div>
+                    <div class="score-input-item">
+                        <label for="scoreMar">มีนาคม</label>
+                        <input type="number" id="scoreMar" min="0" max="100">
+                    </div>
+                </div>
+                <div class="password-verification" style="margin-top: 20px;">
+                    <label for="adminPasswordInput" style="font-weight: bold; color: #333;">รหัสผ่านแอดมิน:</label>
+                    <input type="password" id="adminPasswordInput" placeholder="กรอกรหัสผ่านเพื่อบันทึก">
+                    <p id="passwordErrorMessage" style="color: red; text-align: center; margin-top: 10px;"></p>
+                </div>
+                <div class="score-modal-actions">
+                    <button class="save-btn" id="saveScoresBtn">บันทึกคะแนน</button>
+                    <button class="cancel-btn" id="cancelScoresBtn">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ข้อมูลนักเรียนสำหรับห้อง 3/1
+        const studentsData = [
+            { id: "15446", name: "กฤติพงศ์ นามบุตร", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "หัวหน้าห้อง", dob: "06 สิงหาคม 2553", phone: "063-071-0560" },
+            { id: "15447", name: "ธนาศักดิ์ คนหมั้น", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "26 มกราคม 2554", phone: "082-345-6789" },
+            { id: "15449", name: "ปิยวัฒน์ คนเพียร", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "16 มิถุนายน 2553", phone: "083-456-7890" },
+            { id: "ST004", name: "นักเรียน 4", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST005", name: "นักเรียน 5", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST006", name: "นักเรียน 6", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST007", name: "นักเรียน 7", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST008", name: "นักเรียน 8", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST009", name: "นักเรียน 9", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST010", name: "นักเรียน 10", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST011", name: "นักเรียน 11", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST012", name: "นักเรียน 12", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST013", name: "นักเรียน 13", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST014", name: "นักเรียน 14", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST015", name: "นักเรียน 15", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST016", name: "นักเรียน 16", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST017", name: "นักเรียน 17", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST018", name: "นักเรียน 18", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST019", name: "นักเรียน 19", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST020", name: "นักเรียน 20", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST021", name: "นักเรียน 21", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST022", name: "นักเรียน 22", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST023", name: "นักเรียน 23", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST024", name: "นักเรียน 24", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST025", name: "นักเรียน 25", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST026", name: "นักเรียน 26", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST027", name: "นักเรียน 27", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST028", name: "นักเรียน 28", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST029", name: "นักเรียน 29", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" },
+            { id: "ST030", name: "นักเรียน 30", grade: "มัธยมศึกษาปีที่ 3", class: "3/1", status: "นักเรียน", dob: "-", phone: "-" }
+        ];
+
+        // ข้อมูลคะแนนนักเรียนสำหรับห้อง 3/1 (ปรับปรุงให้เป็นรายเดือน) - จะถูก Overwrite ด้วยข้อมูลจาก localStorage หรือ server
+        const studentScores = {};
+        const months = ["พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม", "มกราคม", "กุมภาพันธ์", "มีนาคม"];
+
+        // Initialize scores: May = 25, others = 0 for all students (fallback if no local storage data)
+        function initializeDefaultScores() {
+            studentsData.forEach(student => {
+                studentScores[student.id] = {};
+                months.forEach(month => {
+                    studentScores[student.id][month] = (month === "พฤษภาคม") ? 25 : 0;
+                });
+            });
+        }
+
+        // Function to load scores from server (new) or localStorage (fallback)
+        async function loadScoresFromServer(studentId) {
+            try {
+                const response = await fetch(`http://localhost:3000/get-student-scores/${studentId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data.scores) {
+                    // Merge server scores with current studentScores, ensuring all months are present
+                    studentScores[studentId] = {};
+                    months.forEach(month => {
+                        studentScores[studentId][month] = data.scores[month] !== undefined ? data.scores[month] : ((month === "พฤษภาคม") ? 25 : 0);
+                    });
+                    console.log(`Scores for ${studentId} loaded from server.`);
+                    return true; // Successfully loaded from server
+                }
+            } catch (e) {
+                console.warn(`Could not load scores for ${studentId} from server, falling back to local storage or defaults:`, e);
+            }
+            return false; // Failed to load from server
+        }
+
+        async function loadAllScores() {
+            let loadedFromServer = false;
+            for (const student of studentsData) {
+                const success = await loadScoresFromServer(student.id);
+                if (success) {
+                    loadedFromServer = true;
+                }
+            }
+
+            if (!loadedFromServer) {
+                // If no scores could be loaded from the server for any student, try localStorage for all.
+                const storedScores = localStorage.getItem('studentMonthlyScores_room3_1');
+                if (storedScores) {
+                    try {
+                        const parsedScores = JSON.parse(storedScores);
+                        studentsData.forEach(student => {
+                            if (parsedScores[student.id]) {
+                                studentScores[student.id] = {};
+                                months.forEach(month => {
+                                    studentScores[student.id][month] = parsedScores[student.id][month] !== undefined ? parsedScores[student.id][month] : ((month === "พฤษภาคม") ? 25 : 0);
+                                });
+                            } else {
+                                studentScores[student.id] = {};
+                                months.forEach(month => {
+                                    studentScores[student.id][month] = (month === "พฤษภาคม") ? 25 : 0;
+                                });
+                            }
+                        });
+                        console.log("Scores loaded from localStorage.");
+                    } catch (e) {
+                        console.error("Error parsing scores from localStorage:", e);
+                        initializeDefaultScores();
+                    }
+                } else {
+                    initializeDefaultScores();
+                    console.log("No scores found in localStorage, initialized with default values.");
+                }
+            }
+        }
+
+        // Call load all scores at the beginning
+        // loadAllScores(); // Moved to DOMContentLoaded to ensure elements are ready
+
+
+        // รับอ้างอิงถึงองค์ประกอบ Modal และปุ่มต่างๆ
+        const modalOverlay = document.getElementById('studentDetailModal');
+        const closeButton = document.querySelector('.close-button');
+
+        // รับอ้างอิงถึงส่วนที่จะแสดงข้อมูลใน Modal
+        const modalStudentName = document.getElementById('modalStudentName');
+        const modalStudentId = document.getElementById('modalStudentId');
+        const modalStudentGrade = document.getElementById('modalStudentGrade');
+        const modalStudentClass = document.getElementById('modalStudentClass');
+        const modalStudentStatus = document.getElementById('modalStudentStatus');
+        const modalStudentDob = document.getElementById('modalStudentDob');
+        const modalStudentPhone = document.getElementById('modalStudentPhone');
+
+        // รับอ้างอิงถึง input fields ของคะแนนใน Modal
+        const scoreInputFields = {};
+        months.forEach(month => {
+            // Mapping Thai month names to English prefixes for input IDs
+            const monthPrefixMap = {
+                "พฤษภาคม": "May", "มิถุนายน": "Jun", "กรกฎาคม": "Jul",
+                "สิงหาคม": "Aug", "กันยายน": "Sep", "ตุลาคม": "Oct",
+                "พฤศจิกายน": "Nov", "ธันวาคม": "Dec", "มกราคม": "Jan",
+                "กุมภาพันธ์": "Feb", "มีนาคม": "Mar"
+            };
+            const englishPrefix = monthPrefixMap[month];
+            scoreInputFields[month] = document.getElementById(`score${englishPrefix}`);
+        });
+
+        const saveScoresBtn = document.getElementById('saveScoresBtn');
+        const cancelScoresBtn = document.getElementById('cancelScoresBtn');
+        const currentDateTimeSpan = document.getElementById('currentDateTime'); // รับอ้างอิงถึง span สำหรับวันที่/เวลา
+        
+        // Elements for password verification
+        const adminPasswordInput = document.getElementById('adminPasswordInput');
+        const passwordErrorMessage = document.getElementById('passwordErrorMessage');
+        const ADMIN_PASSWORD = "301"; // Define the admin password
+
+
+        // รับอ้างอิงถึงองค์ประกอบตารางและปุ่มสลับ
+        const studentListTableContainer = document.getElementById('studentListTableContainer');
+        const scoreTableContainer = document.getElementById('scoreTableContainer');
+        const studentListTableBody = document.getElementById('studentListTableBody');
+        const scoreTableBody = document.getElementById('scoreTableBody');
+        const showStudentListBtn = document.getElementById('showStudentListBtn');
+        const showStudentScoresBtn = document.getElementById('showStudentScoresBtn');
+
+        // ฟังก์ชันสำหรับเปิด Modal
+        function openModal(studentId) {
+            const student = studentsData.find(s => s.id === studentId); // ค้นหานักเรียนจาก array
+            if (student) {
+                // Populate student details
+                modalStudentName.textContent = `ข้อมูลนักเรียน: ${student.name}`;
+                modalStudentId.textContent = student.id;
+                modalStudentGrade.textContent = student.grade;
+                modalStudentClass.textContent = student.class;
+                modalStudentStatus.textContent = student.status;
+                modalStudentDob.textContent = student.dob;
+                modalStudentPhone.textContent = student.phone;
+
+                // Populate monthly scores in modal input fields
+                const scores = studentScores[studentId]; // Get current scores (from localStorage or server)
+                if (scores) {
+                    months.forEach(monthKey => {
+                        const inputElement = scoreInputFields[monthKey];
+                        if (inputElement) {
+                            inputElement.value = scores[monthKey];
+                        }
+                    });
+                }
+
+                // Display current date and time
+                const now = new Date();
+                currentDateTimeSpan.textContent = `(อัปเดตล่าสุด: ${now.toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' })})`;
+
+                // Clear previous password error message and input
+                adminPasswordInput.value = '';
+                passwordErrorMessage.textContent = '';
+
+                modalOverlay.dataset.currentStudentId = studentId; // Store current student ID in modal for saving
+                modalOverlay.style.display = 'flex';
+            } else {
+                console.error('Student data not found for ID:', studentId);
+                modalStudentName.textContent = `ข้อมูลนักเรียน: ไม่พบข้อมูล`;
+                modalStudentId.textContent = studentId;
+                modalStudentGrade.textContent = "-";
+                modalStudentClass.textContent = "-";
+                modalStudentStatus.textContent = "-";
+                modalStudentDob.textContent = "-";
+                modalStudentPhone.textContent = "-";
+                modalOverlay.style.display = 'flex';
+            }
+        }
+
+        // ฟังก์ชันสำหรับปิด Modal
+        function closeModal() {
+            modalOverlay.style.display = 'none';
+            delete modalOverlay.dataset.currentStudentId; // Clear stored student ID
+        }
+
+        // ฟังก์ชันสำหรับบันทึกคะแนนรายเดือนลง Local Storage และส่งไปเซิร์ฟเวอร์
+        async function saveMonthlyScores() { // เปลี่ยนเป็น async
+            const enteredPassword = adminPasswordInput.value;
+            if (enteredPassword !== ADMIN_PASSWORD) {
+                passwordErrorMessage.textContent = "รหัสผ่านไม่ถูกต้อง! โปรดลองอีกครั้ง";
+                return; // Stop the save process
+            } else {
+                passwordErrorMessage.textContent = ""; // Clear error if password is correct
+            }
+
+            const studentIdToSave = modalOverlay.dataset.currentStudentId;
+            const student = studentsData.find(s => s.id === studentIdToSave); // หาข้อมูลนักเรียน
+            if (!studentIdToSave || !studentScores[studentIdToSave] || !student) {
+                console.error("No student ID found for saving scores or student data missing.");
+                return;
+            }
+
+            const currentStudentScores = studentScores[studentIdToSave];
+            let hasInvalidScore = false; // Flag to check for invalid scores
+            months.forEach(month => {
+                const inputElement = scoreInputFields[month];
+                if (inputElement) {
+                    const scoreValue = parseInt(inputElement.value);
+                    // Validate score to be within 0-100 and a valid number
+                    if (isNaN(scoreValue) || scoreValue < 0 || scoreValue > 100) {
+                        passwordErrorMessage.textContent = `คะแนนเดือน ${month} ต้องเป็นตัวเลขระหว่าง 0 ถึง 100`;
+                        hasInvalidScore = true;
+                        return; // Exit forEach early
+                    }
+                    currentStudentScores[month] = scoreValue; // Update local data
+                }
+            });
+
+            if (hasInvalidScore) {
+                return; // Stop the save process if any score was invalid
+            }
+
+            // Save the entire studentScores object to localStorage
+            localStorage.setItem('studentMonthlyScores_room3_1', JSON.stringify(studentScores));
+            console.log(`Scores for ${studentIdToSave} saved to localStorage.`);
+
+            // ************************************************************
+            // ************ ส่วนที่เพิ่มเข้ามาสำหรับการส่งข้อมูลไปเซิร์ฟเวอร์ ************
+            // ************************************************************
+            const dataToSend = {
+                studentId: student.id,
+                studentName: student.name,
+                scores: currentStudentScores
+            };
+
+            try {
+                // ใช้ fetch API เพื่อส่งข้อมูลไปยัง Node.js server
+                const response = await fetch('http://localhost:3000/save-student-scores', { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataToSend)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Server error');
+                }
+                const responseData = await response.json();
+                console.log('Server response:', responseData.message);
+                // alert('บันทึกคะแนนไปยังเซิร์ฟเวอร์สำเร็จ!'); // หลีกเลี่ยง alert()
+            } catch (error) {
+                console.error('Error sending scores to server:', error);
+                passwordErrorMessage.textContent = `เกิดข้อผิดพลาดในการบันทึกคะแนนไปยังเซิร์ฟเวอร์: ${error.message}`;
+                return; // หยุดการทำงานถ้ามีข้อผิดพลาดในการบันทึกบนเซิร์ฟเวอร์
+            }
+            // ************************************************************
+
+            renderStudentScores(); // Re-render the score table to show updated scores
+            closeModal(); // Close the modal after saving
+        }
+
+
+        // ฟังก์ชันสำหรับสร้างและแสดงตารางรายชื่อนักเรียน
+        function renderStudentList() {
+            studentListTableBody.innerHTML = ''; // Clear old data
+            let rowNum = 1;
+            studentsData.forEach(student => {
+                const row = studentListTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${rowNum++}</td>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.status}</td>
+                    <td><button class="details-btn" data-student-id="${student.id}">ดูรายละเอียด</button></td>
+                `;
+            });
+            // Re-attach Event Listeners for "ดูรายละเอียด" buttons after re-rendering
+            document.querySelectorAll('#studentListTableBody .details-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const studentId = event.target.dataset.studentId;
+                    openModal(studentId);
+                });
+            });
+        }
+
+        // ฟังก์ชันสำหรับสร้างและแสดงตารางคะแนนนักเรียน
+        async function renderStudentScores() { // เปลี่ยนเป็น async
+            scoreTableBody.innerHTML = ''; // Clear old data
+
+            // โหลดข้อมูลทั้งหมดจากเซิร์ฟเวอร์ก่อน
+            await loadAllScores(); 
+
+            let rowNum = 1;
+            studentsData.forEach(student => {
+                const scores = studentScores[student.id] || {}; // Use updated local data after loading
+                let totalScore = 0;
+                
+                const row = scoreTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${rowNum++}</td>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${scores["พฤษภาคม"] !== undefined ? scores["พฤษภาคม"] : '-'}</td>
+                    <td>${scores["มิถุนายน"] !== undefined ? scores["มิถุนายน"] : '-'}</td>
+                    <td>${scores["กรกฎาคม"] !== undefined ? scores["กรกฎาคม"] : '-'}</td>
+                    <td>${scores["สิงหาคม"] !== undefined ? scores["สิงหาคม"] : '-'}</td>
+                    <td>${scores["กันยายน"] !== undefined ? scores["กันยายน"] : '-'}</td>
+                    <td>${scores["ตุลาคม"] !== undefined ? scores["ตุลาคม"] : '-'}</td>
+                    <td>${scores["พฤศจิกายน"] !== undefined ? scores["พฤศจิกายน"] : '-'}</td>
+                    <td>${scores["ธันวาคม"] !== undefined ? scores["ธันวาคม"] : '-'}</td>
+                    <td>${scores["มกราคม"] !== undefined ? scores["มกราคม"] : '-'}</td>
+                    <td>${scores["กุมภาพันธ์"] !== undefined ? scores["กุมภาพันธ์"] : '-'}</td>
+                    <td>${scores["มีนาคม"] !== undefined ? scores["มีนาคม"] : '-'}</td>
+                    <td id="totalScore-${student.id}"></td>
+                `;
+                // Calculate total score after adding all month scores
+                months.forEach(month => {
+                    totalScore += (scores[month] || 0);
+                });
+                row.querySelector(`#totalScore-${student.id}`).textContent = totalScore;
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', async () => { // เปลี่ยนเป็น async
+            await loadAllScores(); // โหลดคะแนนทั้งหมดจากเซิร์ฟเวอร์เมื่อหน้าเว็บโหลดเสร็จ
+
+            renderStudentList(); // Render student list table by default
+
+            closeButton.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (event) => {
+                if (event.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+
+            saveScoresBtn.addEventListener('click', saveMonthlyScores);
+            cancelScoresBtn.addEventListener('click', closeModal);
+
+            showStudentListBtn.addEventListener('click', () => {
+                studentListTableContainer.style.display = 'block';
+                scoreTableContainer.style.display = 'none';
+                showStudentListBtn.classList.add('active');
+                showStudentScoresBtn.classList.remove('active');
+                renderStudentList(); // Re-render to ensure fresh data/event listeners
+            });
+
+            showStudentScoresBtn.addEventListener('click', () => {
+                studentListTableContainer.style.display = 'none';
+                scoreTableContainer.style.display = 'block';
+                showStudentScoresBtn.classList.add('active');
+                showStudentListBtn.classList.remove('active');
+                renderStudentScores(); // Render scores table when clicked
+            });
+        });
+    </script>
+</body>
+</html>

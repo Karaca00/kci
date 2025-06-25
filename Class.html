@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลระดับชั้น - คำชะอีวิทยาคาร</title>
+    <style>
+        /* CSS สำหรับจัดรูปแบบทั่วไปของหน้าเว็บ */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* สีพื้นหลังอ่อนๆ */
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* สไตล์สำหรับส่วนหัวของเว็บไซต์ */
+        header {
+            background-color: #2c3e50; /* สีกรมท่าเข้ม */
+            color: #ecf0f1; /* สีเทาอ่อน */
+            padding: 20px 0;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        /* สไตล์สำหรับแถบนำทาง (Navigation Bar) */
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* ให้เมนูขึ้นบรรทัดใหม่เมื่อหน้าจอเล็ก */
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 5px 0;
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #3498db; /* สีฟ้าอ่อนเมื่อโฮเวอร์ */
+            border-bottom: 2px solid #3498db;
+        }
+
+        /* สไตล์สำหรับคอนเทนเนอร์ของตาราง */
+        .table-container {
+            width: 90%;
+            max-width: 1000px;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* ทำให้ตารางมีแถบเลื่อนแนวนอนถ้าข้อมูลเยอะเกินไป */
+        }
+
+        /* สไตล์สำหรับตาราง */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* รวมเส้นขอบของเซลล์เข้าด้วยกัน */
+            margin: 0 auto; /* จัดกึ่งกลางตาราง */
+        }
+
+        /* สไตล์สำหรับส่วนหัวของตาราง (<thead>) */
+        th {
+            background-color: #34495e; /* สีกรมท่า */
+            color: #ecf0f1;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #2c3e50;
+            font-weight: bold;
+        }
+
+        /* สไตล์สำหรับข้อมูลในตาราง (<td>) และแถว (<tr>) */
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd; /* เส้นแบ่งแถว */
+            text-align: left;
+        }
+
+        /* สไตล์เมื่อนำเมาส์ไปชี้ที่แถว */
+        tr:hover {
+            background-color: #f0f8ff; /* สีฟ้าอ่อนเมื่อโฮเวอร์ */
+        }
+
+        /* สไตล์สำหรับแถวคู่-คี่ (เพื่อให้แยกแยะง่ายขึ้น) */
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* สีเทาอ่อนสำหรับแถวคู่ */
+        }
+
+        /* สไตล์สำหรับปุ่มดูรายละเอียด */
+        .details-btn {
+            background-color: #4CAF50; /* สีเขียว */
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .details-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* สไตล์สำหรับ Modal (Pop-up) */
+        .modal-overlay {
+            display: none; /* ซ่อนไว้ตอนแรก */
+            position: fixed; /* อยู่เหนือเนื้อหาทั้งหมด */
+            z-index: 1000; /* ให้แสดงทับองค์ประกอบอื่น */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* พื้นหลังทึบแสง */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out; /* แอนิเมชันตอนเปิด */
+            text-align: center; /* จัดเนื้อหาใน Modal ให้อยู่กึ่งกลาง */
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+        }
+
+        .modal-content p strong {
+            color: #34495e;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* แอนิเมชัน Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* สไตล์สำหรับปุ่มใน Modal (สำหรับปุ่มห้องเรียนที่สร้างขึ้นมาใหม่) */
+        .modal-room-btn {
+            background-color: #3498db; /* สีฟ้า */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+            transition: background-color 0.3s ease;
+            display: inline-block; /* ทำให้ปุ่มอยู่บรรทัดเดียวกัน */
+        }
+
+        .modal-room-btn:hover {
+            background-color: #2980b9;
+        }
+
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            nav ul li {
+                margin: 0 10px;
+            }
+            nav ul li a {
+                font-size: 1em;
+            }
+            .table-container {
+                width: 95%;
+                padding: 15px;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+            .details-btn, .modal-room-btn { /* รวมสไตล์สำหรับปุ่มใน Modal ด้วย */
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            .close-button {
+                font-size: 1.8em;
+                top: 10px;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            nav ul li {
+                margin: 0 5px;
+            }
+            nav ul li a {
+                font-size: 0.9em;
+            }
+            .table-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>คำชะอีวิทยาคาร</h1>
+        <p>โรงเรียนแห่งความรู้ คู่คุณธรรม</p>
+        <nav>
+            <ul>
+                <li><a href="index.html">หน้าหลัก</a></li>
+                <li><a href="Class.html">ข้อมูลระดับชั้น</a></li>
+                <li><a href="#about">เกี่ยวกับโรงเรียน</a></li>
+                <li><a href="#contact">ติดต่อเรา</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="table-container">
+        <h2>ข้อมูลระดับชั้น</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ลำดับชั้น</th>
+                    <th>ระดับชั้น</th>
+                    <th>จำนวนนักเรียน</th>
+                    <th>จำนวนห้อง</th>
+                    <th>รายละเอียด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-grade-id="grade1">
+                    <td>1</td>
+                    <td>มัธยมศึกษาปีที่ 1</td>
+                    <td>150</td>
+                    <td>5</td>
+                    <td><button class="details-btn" data-grade-id="grade1">ดูรายละเอียด</button></td>
+                </tr>
+                <tr data-grade-id="grade2">
+                    <td>2</td>
+                    <td>มัธยมศึกษาปีที่ 2</td>
+                    <td>140</td>
+                    <td>5</td>
+                    <td><button class="details-btn" data-grade-id="grade2">ดูรายละเอียด</button></td>
+                </tr>
+                <tr data-grade-id="grade3">
+                    <td>3</td>
+                    <td>มัธยมศึกษาปีที่ 3</td>
+                    <td>143</td>
+                    <td>5</td>
+                    <td><button class="details-btn" data-grade-id="grade3">ดูรายละเอียด</button></td>
+                </tr>
+                <tr data-grade-id="grade4">
+                    <td>4</td>
+                    <td>มัธยมศึกษาปีที่ 4</td>
+                    <td>130</td>
+                    <td>5</td>
+                    <td><button class="details-btn" data-grade-id="grade4">ดูรายละเอียด</button></td>
+                </tr>
+                <tr data-grade-id="grade5">
+                    <td>5</td>
+                    <td>มัธยมศึกษาปีที่ 5</td>
+                    <td>125</td>
+                    <td>5</td>
+                    <td><button class="details-btn" data-grade-id="grade5">ดูรายละเอียด</button></td>
+                </tr>
+                <tr data-grade-id="grade6">
+                    <td>6</td>
+                    <td>มัธยมศึกษาปีที่ 6</td>
+                    <td>110</td>
+                    <td>5</td>
+                    <td><button class="details-btn" data-grade-id="grade6">ดูรายละเอียด</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="studentDetailModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modalStudentName"></h3>
+            <p><strong>ระดับชั้น:</strong> <span id="modalGradeName"></span></p>
+            <p>กดปุ่มด้านล่างเพื่อดูรายชื่อนักเรียนของแต่ละห้องเรียน</p>
+            <div id="modalRoomButtonsContainer" style="margin-top: 15px;">
+                <!-- Buttons for rooms will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลระดับชั้นและห้องเรียน
+        const classDetailsData = {
+            "grade1": {
+                name: "มัธยมศึกษาปีที่ 1",
+                studentCount: 150,
+                roomCount: 5,
+                rooms: ["1/1", "1/2", "1/3", "1/4", "1/5"]
+            },
+            "grade2": {
+                name: "มัธยมศึกษาปีที่ 2",
+                studentCount: 140,
+                roomCount: 5,
+                rooms: ["2/1", "2/2", "2/3", "2/4", "2/5"]
+            },
+            "grade3": {
+                name: "มัธยมศึกษาปีที่ 3",
+                studentCount: 120,
+                roomCount: 5,
+                rooms: ["3/1", "3/2", "3/3", "3/4","3/5"]
+            },
+            "grade4": {
+                name: "มัธยมศึกษาปีที่ 4",
+                studentCount: 130,
+                roomCount: 5,
+                rooms: ["4/1", "4/2", "4/3", "4/4", "4/5"]
+            },
+            "grade5": {
+                name: "มัธยมศึกษาปีที่ 5",
+                studentCount: 125,
+                roomCount: 5,
+                rooms: ["5/1", "5/2", "5/3", "5/4", "5/5"]
+            },
+            "grade6": {
+                name: "มัธยมศึกษาปีที่ 6",
+                studentCount: 110,
+                roomCount: 5,
+                rooms: ["6/1", "6/2", "6/3", "6/4", "6/5"]
+            }
+        };
+
+        // รับอ้างอิงถึงองค์ประกอบ Modal และปุ่มต่างๆ
+        const modalOverlay = document.getElementById('studentDetailModal');
+        const closeButton = document.querySelector('.close-button');
+        const detailButtons = document.querySelectorAll('.details-btn');
+        const modalRoomButtonsContainer = document.getElementById('modalRoomButtonsContainer');
+
+        // รับอ้างอิงถึงส่วนที่จะแสดงข้อมูลใน Modal
+        const modalStudentName = document.getElementById('modalStudentName');
+        const modalGradeName = document.getElementById('modalGradeName');
+
+        // ฟังก์ชันสำหรับเปิด Modal
+        function openModal(gradeId) {
+            const classInfo = classDetailsData[gradeId];
+            if (classInfo) {
+                modalStudentName.textContent = `ข้อมูลระดับชั้น: ${classInfo.name}`;
+                modalGradeName.textContent = classInfo.name;
+                modalOverlay.dataset.currentGradeId = gradeId;
+
+                // ล้างปุ่มเดิมออกก่อนที่จะสร้างใหม่
+                modalRoomButtonsContainer.innerHTML = '';
+
+                // สร้างปุ่มสำหรับแต่ละห้องเรียนในระดับชั้นนี้
+                classInfo.rooms.forEach(roomName => {
+                    const button = document.createElement('button');
+                    button.classList.add('modal-room-btn');
+                    button.textContent = `ห้องเรียน ${roomName}`;
+                    // สร้าง roomId ในรูปแบบที่ใช้ใน JavaScript (เช่น "3_1" แทน "3/1")
+                    const roomIdForUrl = roomName.replace('/', '_');
+                    button.dataset.gradeId = gradeId;
+                    button.dataset.roomId = roomIdForUrl;
+                    button.addEventListener('click', (event) => {
+                        const clickedGradeId = event.target.dataset.gradeId;
+                        const clickedRoomId = event.target.dataset.roomId;
+                        // นำทางไปยังหน้า Students.html พร้อมส่ง gradeId และ roomId
+                        window.location.href = `Students${roomIdForUrl}.html`;
+                    });
+                    modalRoomButtonsContainer.appendChild(button);
+                });
+
+                modalOverlay.style.display = 'flex';
+            } else {
+                console.error('Class data not found for ID:', gradeId);
+                modalStudentName.textContent = `ข้อมูลระดับชั้น: ไม่พบข้อมูล`;
+                modalGradeName.textContent = "ไม่พบ";
+                modalOverlay.style.display = 'flex';
+                modalRoomButtonsContainer.innerHTML = '<p>ไม่พบข้อมูลห้องเรียนสำหรับระดับชั้นนี้</p>'; // แสดงข้อความแทนปุ่ม
+            }
+        }
+
+        // ฟังก์ชันสำหรับปิด Modal
+        function closeModal() {
+            modalOverlay.style.display = 'none';
+        }
+
+        // เพิ่ม Event Listener ให้กับปุ่ม 'ดูรายละเอียด' แต่ละปุ่มในตาราง
+        detailButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const gradeId = event.target.dataset.gradeId;
+                openModal(gradeId);
+            });
+        });
+
+        // เพิ่ม Event Listener ให้กับปุ่มปิด Modal
+        closeButton.addEventListener('click', closeModal);
+
+        // ปิด Modal เมื่อคลิกนอก Modal (บนพื้นหลังทึบแสง)
+        window.addEventListener('click', (event) => {
+            if (event.target == modalOverlay) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

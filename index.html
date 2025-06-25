@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าหลัก - คำชะอีวิทยาคาร</title>
+    <style>
+        /* CSS สำหรับจัดรูปแบบทั่วไปของหน้าเว็บ */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* สีพื้นหลังอ่อนๆ */
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* สไตล์สำหรับส่วนหัวของเว็บไซต์ */
+        header {
+            background-color: #2c3e50; /* สีกรมท่าเข้ม */
+            color: #ecf0f1; /* สีเทาอ่อน */
+            padding: 20px 0;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        /* สไตล์สำหรับแถบนำทาง (Navigation Bar) */
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* ให้เมนูขึ้นบรรทัดใหม่เมื่อหน้าจอเล็ก */
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 5px 0;
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #3498db; /* สีฟ้าอ่อนเมื่อโฮเวอร์ */
+            border-bottom: 2px solid #3498db;
+        }
+
+        /* สไตล์สำหรับส่วนบทนำของหน้าหลัก */
+        .introduction-section {
+            width: 90%;
+            max-width: 900px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .introduction-section h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-top: 0;
+        }
+
+        .introduction-section p {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        /* สไตล์สำหรับคอนเทนเนอร์ของตาราง */
+        .table-container {
+            width: 90%;
+            max-width: 1000px; /* เพิ่มความกว้างสูงสุดของตารางเล็กน้อย */
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* ทำให้ตารางมีแถบเลื่อนแนวนอนถ้าข้อมูลเยอะเกินไป */
+        }
+
+        /* สไตล์สำหรับตารางนักเรียน */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* รวมเส้นขอบของเซลล์เข้าด้วยกัน */
+            margin: 0 auto; /* จัดกึ่งกลางตาราง */
+        }
+
+        /* สไตล์สำหรับส่วนหัวของตาราง (<thead>) */
+        th {
+            background-color: #34495e; /* สีกรมท่า */
+            color: #ecf0f1;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #2c3e50;
+            font-weight: bold;
+        }
+
+        /* สไตล์สำหรับข้อมูลในตาราง (<td>) และแถว (<tr>) */
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd; /* เส้นแบ่งแถว */
+            text-align: left;
+        }
+
+        /* สไตล์เมื่อนำเมาส์ไปชี้ที่แถว */
+        tr:hover {
+            background-color: #f0f8ff; /* สีฟ้าอ่อนเมื่อโฮเวอร์ */
+        }
+
+        /* สไตล์สำหรับแถวคู่-คี่ (เพื่อให้แยกแยะง่ายขึ้น) */
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* สีเทาอ่อนสำหรับแถวคู่ */
+        }
+
+        /* สไตล์สำหรับปุ่มดูรายละเอียด */
+        .details-btn {
+            background-color: #4CAF50; /* สีเขียว */
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .details-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* สไตล์สำหรับ Modal (Pop-up) */
+        .modal-overlay {
+            display: none; /* ซ่อนไว้ตอนแรก */
+            position: fixed; /* อยู่เหนือเนื้อหาทั้งหมด */
+            z-index: 1000; /* ให้แสดงทับองค์ประกอบอื่น */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* พื้นหลังทึบแสง */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out; /* แอนิเมชันตอนเปิด */
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+        }
+
+        .modal-content p strong {
+            color: #34495e;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* แอนิเมชัน Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            nav ul li {
+                margin: 0 10px;
+            }
+            nav ul li a {
+                font-size: 1em;
+            }
+            .introduction-section {
+                padding: 20px;
+                width: 95%;
+            }
+            .introduction-section h2 {
+                font-size: 1.8em;
+            }
+            .introduction-section p {
+                font-size: 1em;
+            }
+            .table-container {
+                width: 95%; /* ใช้ความกว้างมากขึ้นบนหน้าจอเล็ก */
+                padding: 15px;
+            }
+            th, td {
+                padding: 8px 10px; /* ลด padding ลง */
+                font-size: 0.9em; /* ลดขนาดตัวอักษร */
+            }
+            .details-btn {
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            .close-button {
+                font-size: 1.8em;
+                top: 10px;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            nav ul li {
+                margin: 0 5px;
+            }
+            nav ul li a {
+                font-size: 0.9em;
+            }
+            .introduction-section {
+                padding: 15px;
+            }
+            .introduction-section h2 {
+                font-size: 1.5em;
+            }
+            .introduction-section p {
+                font-size: 0.9em;
+            }
+            .table-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>คำชะอีวิทยาคาร</h1>
+        <p>โรงเรียนแห่งความรู้ คู่คุณธรรม</p>
+        <nav>
+            <ul>
+                <li><a href="index.html">หน้าหลัก</a></li>
+                <li><a href="Class.html">ข้อมูลระดับชั้น</a></li>
+                <li><a href="#about">เกี่ยวกับโรงเรียน</a></li>
+                <li><a href="#contact">ติดต่อเรา</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="home" class="introduction-section">
+        <h2>ยินดีต้อนรับสู่เว็บไซต์โรงเรียนคำชะอีวิทยาคาร</h2>
+        <p>โรงเรียนคำชะอีวิทยาคาร</p>
+        <p>สร้างและพัฒนาเด็กดีไปสู่สังคม</p>
+        <p>สร้างโดย Mr.Piyawat</p>
+    </div>
+</body>
+</html>
